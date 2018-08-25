@@ -1,2 +1,2 @@
 # ssh-server
-Docker ssh-server image
+Docker ssh-server image - based on alpine:3.8
