@@ -9,7 +9,7 @@ The following environment variable are available:
 
 - **PUB_KEY_ONLY** - default: true
 	> use this variable to **force** authentication with **public key**. 
-	The key pair is **generated** at each instantiation (docker run), hence see **docker logs** to get public key. 
+	The key pair is **generated** at each instantiation (docker run), hence see **docker logs** to get private key. 
 	Setting this variable to false allow interactive login authentication.
 
 - **ROOT_PWD** - default: alpine
@@ -28,31 +28,55 @@ If you have just built the image or pulled from docker hub, you can instantiate 
 As soon as your container is running you can check the container logs as follows:
 `docker logs -f sshd`
 and take a look at the output
-  >==========================================================
-Generating public/private rsa key pair.
-Created directory '/root/.ssh'.
-Your identification has been saved in /root/.ssh/id_rsa.
-Your public key has been saved in /root/.ssh/id_rsa.pub.
-The key fingerprint is:
-SHA256:Co73xmqtKi2WXlIko/KHM3ItJ25RXd7V/rUKEpiMLxA root@3e822f6b28fa
-The key's randomart image is:
-+---[RSA 2048]----+
-| . |
-| E  . . .  |
-| o ...ooo. . . |
-|. +....+... . .|
-|o  oo . S .  .o|
-|..o= o o . . ..|
-|.o@o*oo . . .  |
-|o*=O..+  . |
-|o=ooo+.  |
-+----[SHA256]-----+
-===================SAVE YOUR PUBLIC KEY===================
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDMIYVIRkvAfL/tyIORePn6MiT/XBARCArrsjGLgSQq/0cxgZQv/t2zS7Om3Iy74+gdfglhY/Qi5dHzBZ7K2UEeKBWPngmHB+9ZJ3zukR0CUJLfThdp5AesPsiezPmdjBzJ74UXlYmDu42HjKhqhBySsEOwJTicO84kibt8ghaFU/y7w3fUiHdWbJ88h8+YOtDSBFwWVJb7y+Y4fNWKS40gqiUxvtcHYcMe7WMs/ucDIdBh/fqYlevc6R04eAd6h/KICCz0VXTeJFGqZ7o4iAEPl1m5GnkJXVzKqwcGYtE6koKPhxH5okkRLsWNAGARSoS2aEA4avKXBAr2ulj84Fur root@3e822f6b28fa
-==========================================================
-chpasswd: password for 'root' changed
-Server listening on 0.0.0.0 port 22.
-Server listening on :: port 22.
+  > Generating public/private rsa key pair. 
+  >
+  >Created directory '/root/.ssh'.
+  >
+  >Your identification has been saved in /root/.ssh/id_rsa.
+  >
+  >Your public key has been saved in /root/.ssh/id_rsa.pub.
+  >
+  >The key fingerprint is:
+  >
+  >SHA256:Co73xmqtKi2WXlIko/KHM3ItJ25RXd7V/rUKEpiMLxA root@3e822f6b28fa
+  >
+  >The key's randomart image is:
+  > `omissis`
+  >
+  >---SAVE YOUR PRIVATE KEY---
+  >
+  >---BEGIN RSA PRIVATE KEY---
+  >
+  >`omissis`
+  >
+  >---END RSA PRIVATE KEY---
+  > 
+  >chpasswd: password for 'root' changed
+  >
+  >Server listening on 0.0.0.0 port 22.
+  >
+  >Server listening on :: port 22.
+
+## Use case scenario
+Imagine that you don't want to configure your router to access a service on your private network with dynamic ip address and nat.
+
+Assume you have access to some docker enable external premise where you can istanciate a new container. (with visual studio subscription you can istantiate an azure minimal vm with docker and a static public ip address)
+
+Assume that on your home premises you have an ssh-client enabled device that can open a tunnel to the cloud server and activate a remote port forward. (this openssh-server image has enabled by default "**GatewayPorts**" parameter.)
+
+If a pc on your home network opened a tunnel this way, now you can bypass all the NAT/Firewall configuration just accessing your Cloud public ip address with the remote forwarded port.
+  > Example:
+  >- On your own raspberry pi you have a service (web server) on port 80
+  >- You have deployed a container on a remote cloud infrastructure exposing ports 22000 and 65000.
+  >
+  >`docker run --name sshd -d -p22000:22 -p65000:65000 carlomendola85/openssh-server:latest`
+  >
+  > execute a command as follow:
+  > `ssh -A -R 65000:192.168.8.1:80 root@yourname.westeurope.cloudapp.azure.com -p22000 -i ~/.ssh/id_container_test_rsa -N `
+  > 
+  >Now go to work, and from any network access with your web browser
+  >`yourname.westeurope.cloudapp.azure.com:65000` 
+  >
+  >and with a bit of fortune (if you configured correctly azure nat/firewall for port 22000 and 65000) you shall see your raspberrypi's web server.
 
 ## That's all folks!
-
