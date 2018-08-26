@@ -2,6 +2,8 @@
 
 This is a **Dockerfile** to build a docker image for **openssh-server** based on **alpine**:3.4.
 
+[![Docker Automated build](https://img.shields.io/docker/automated/carlomendola85/openssh-server.svg)](https://hub.docker.com/r/carlomendola85/openssh-server/)
+[![Docker Build Status](https://img.shields.io/docker/build/carlomendola85/openssh-server.svg)](https://hub.docker.com/r/carlomendola85/openssh-server/)
 # Environment Variable
 The following environment variable are available:
 - **SSHD_PORT** - default: 22
@@ -18,11 +20,11 @@ The following environment variable are available:
 	
 # Build docker image
 In order to build image to docker registry enter the project directory and exec the command below:
-`docker build -t carlomendola85/openssh-server:1.0 .`
+`docker build -t carlomendola85/openssh-server:latest .`
 
 # Docker run examples
 If you have just built the image or pulled from docker hub, you can instantiate the openssh-server container with the following command:
-`docker run --name sshd -d -e PUB_KEY_ONLY=false -p 22000:22 carlomendola85/openssh-server:1.0`
+`docker run --name sshd -d -e PUB_KEY_ONLY=false -p 22000:22 carlomendola85/openssh-server:latest`
 
 **Note:** bear in mind that if container network isolation is enforced like in the example above you **must** forward external port to container port - see **-p 22000:22**.
 As soon as your container is running you can check the container logs as follows:
